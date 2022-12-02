@@ -4,14 +4,14 @@ use aoc_runner_derive::{aoc, aoc_generator};
 pub fn input_generator(input: &str) -> Vec<usize> {
     input
         .split("\n\n")
-        .map(|ls| ls.split("\n"))
+        .map(|ls| ls.split('\n'))
         .map(|ns| ns.into_iter().map(|n| n.parse::<usize>().unwrap()).sum())
         .collect()
 }
 
 #[aoc(day1, part1)]
 pub fn max(input: &[usize]) -> usize {
-    *input.into_iter().max().unwrap_or(&0)
+    *input.iter().max().unwrap_or(&0)
 }
 
 #[aoc(day1, part2)]
