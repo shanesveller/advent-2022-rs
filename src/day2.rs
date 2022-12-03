@@ -43,7 +43,7 @@ impl Play {
             (Paper, Loss) => Rock,
             (Scissors, Win) => Rock,
             (Scissors, Loss) => Paper,
-            (play, Draw) => *play
+            (play, Draw) => *play,
         }
     }
 }
