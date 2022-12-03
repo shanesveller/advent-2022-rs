@@ -2,6 +2,8 @@ use aoc_runner_derive::{aoc, aoc_generator};
 
 use std::collections::HashSet;
 
+const LETTERS: &str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
 type Item = char;
 type Compartment = HashSet<Item>;
 type Rucksack = (Compartment, Compartment);
@@ -72,22 +74,11 @@ fn find_missorted_item(left: &Compartment, right: &Compartment) -> Item {
         .expect("no common item")
 }
 
-fn find_common_item(rucksacks: &[Rucksack]) -> Item {
-    *rucksacks
-        .iter()
-        .cloned()
-        .map(|(mut l, r)| {
-            l.extend(r.iter());
-            l
-        })
-        .reduce(|mut l, r| {
-            l.retain(|i| r.contains(i));
-            l
-        })
-        .expect("could not unify items")
-        .iter()
-        .next()
-        .expect("no common items found")
+fn find_common_item(rucksacks: &[HashSet<Item>]) -> Item {
+    LETTERS
+        .chars()
+        .find(|c| rucksacks.iter().all(|r| r.contains(c)))
+        .expect("no common item found")
 }
 
 fn parse_rucksack(l: &str) -> Rucksack {
@@ -106,9 +97,17 @@ fn parse_compartment(items: &[Item]) -> Compartment {
     Compartment::from_iter(items.iter().copied())
 }
 
-#[aoc_generator(day3)]
-pub fn input_generator(input: &str) -> Vec<Rucksack> {
+#[aoc_generator(day3, part1)]
+pub fn rucksack_generator(input: &str) -> Vec<Rucksack> {
     input.lines().map(parse_rucksack).collect()
+}
+
+#[aoc_generator(day3, part2)]
+pub fn items_generator(input: &str) -> Vec<HashSet<Item>> {
+    input
+        .lines()
+        .map(|l| HashSet::from_iter(l.chars()))
+        .collect()
 }
 
 #[aoc(day3, part1)]
@@ -121,6 +120,6 @@ pub fn misplaced_items(input: &[Rucksack]) -> Priority {
 }
 
 #[aoc(day3, part2)]
-pub fn badge_groups(input: &[Rucksack]) -> Priority {
+pub fn badge_groups(input: &[HashSet<Item>]) -> Priority {
     input.chunks(3).map(find_common_item).map(priority).sum()
 }
