@@ -1,8 +1,7 @@
 use aoc_runner_derive::{aoc, aoc_generator};
-use std::collections::VecDeque;
 
 type Crate = char;
-type Stack = VecDeque<Crate>;
+type Stack = Vec<Crate>;
 
 #[derive(Debug)]
 struct Move {
@@ -19,13 +18,13 @@ fn parse_diagram(input: &str) -> Vec<Stack> {
     let mut stacks: Vec<Stack> = labels
         .chars()
         .filter(|c| c.is_ascii_digit())
-        .map(|_| VecDeque::new())
+        .map(|_| Stack::new())
         .collect();
 
     for line in lines {
         for (index, char) in line.chars().skip(1).step_by(4).enumerate() {
             match char {
-                'A'..='Z' => stacks[index].push_front(char),
+                'A'..='Z' => stacks[index].push(char),
                 ' ' => {}
                 _ => unreachable!(),
             }
@@ -64,14 +63,16 @@ fn perform_moves((stacks, moves): &(Vec<Stack>, Vec<Move>)) -> String {
 
     for Move { from, to, quantity } in moves {
         buffer.clear();
-        buffer.extend(stacks[*from - 1].drain(0..(*quantity)));
+        let stack = &mut stacks[*from - 1];
+        let offset = stack.len() - quantity;
+        buffer.extend(stack.drain(offset..));
         let dest = &mut stacks[*to - 1];
-        for unit in buffer.drain(..) {
-            dest.push_front(unit);
+        for unit in buffer.drain(..).rev() {
+            dest.push(unit);
         }
     }
 
-    stacks.iter().map(|stack| stack.front().unwrap()).collect()
+    stacks.iter().map(|stack| stack.last().unwrap()).collect()
 }
 
 #[aoc(day5, part2)]
@@ -82,12 +83,14 @@ fn perform_stackwise_moves((stacks, moves): &(Vec<Stack>, Vec<Move>)) -> String 
 
     for Move { from, to, quantity } in moves {
         buffer.clear();
-        buffer.extend(stacks[*from - 1].drain(0..(*quantity)));
+        let stack = &mut stacks[*from - 1];
+        let offset = stack.len() - quantity;
+        buffer.extend(stack.drain(offset..));
         let dest = &mut stacks[*to - 1];
         for unit in buffer.drain(..) {
-            dest.push_front(unit);
+            dest.push(unit);
         }
     }
 
-    stacks.iter().map(|stack| stack.front().unwrap()).collect()
+    stacks.iter().map(|stack| stack.last().unwrap()).collect()
 }
